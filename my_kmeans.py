@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import random,math
 from scipy.spatial import distance
+
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
@@ -9,12 +11,80 @@ import matplotlib.colors as mcolors
 
 
 
+def plot_3d(res_datapoints,m):
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    x=[]
+    y=[]
+    z=[]
+    l=[]
+    for d,cl in res_datapoints:
+        x.append(d[0])
+        y.append(d[1])
+        z.append(d[2])
+        l.append(cl+10)
+    #print(cl)
+    ax.scatter(x, y, z, c=l)
+    xm=[]
+    ym=[]
+    zm=[]
+    l=[]
+    nm=20
+    for mm in m:
+        xm.append(mm[0])
+        ym.append(mm[1])
+        zm.append(mm[2])
+        l.append(nm)
+        nm +=1
+
+    print(xm,ym,zm)
+    ax.scatter(xm, ym, zm, c="red",marker="X")
+
+    ax.set_xlabel('X-axis')
+    ax.set_ylabel('Y-axis')
+    ax.set_zlabel('Z-axis')
+    plt.show()
+
+
+
+
+
+def plot_2d(res_datapoints,m):
+    x=[]
+    y=[]
+    l=[]
+    for d,cl in res_datapoints:
+        x.append(d[0])
+        y.append(d[1])
+        l.append(cl+10)
+    #print(cl)
+    plt.scatter(x, y, c=l)
+    xm=[]
+    ym=[]
+    l=[]
+    nm=20
+    for mm in m:
+        xm.append(mm[0])
+        ym.append(mm[1])
+        l.append(nm)
+        nm +=1
+
+    print(xm,ym)
+    plt.scatter(xm, ym, c="red",marker="X")
+
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.show()
+
 
 
 def dist(vec1,vec2):
     
-    d = [(a - b)**2 for a, b in zip(vec1, vec2)]
-    d = int(math.sqrt(sum(d)))
+    print("x: ",vec1,"\n m: ",vec2)
+    #d = [(a - b)**2 for a, b in zip(vec1, vec2)]
+    #d = int(math.sqrt(sum(d)))+
+    d = distance.euclidean(vec1,vec2)
     return d
 
 
@@ -123,44 +193,29 @@ test3_scikit = [[1, 2], [1, 4], [1, 0],[10, 2], [10, 4], [10, 0]]
 test4 = [[1,2],[3,2],[7,8],[8,4],[9,0],[40,30], [33,6],[10,39], [33,55],[40,45],[90,34]]
 
 test_random = np.random.randint(10000, size=(100, 2))
+test_random3d = np.random.randint(10000, size=(100, 3))
+
 
 #print(test_random)
 datapoints = {"points":test_random, "Cluster":[]}
 
 #print(disk_kmeans(2,datapoints))
 
-m,res_datapoints,cluster_set = disk_kmeans(2,datapoints)
+m,res_datapoints,cluster_set = disk_kmeans(3,datapoints)
 print("Centroids m: ",m," \nDatapoints: ",res_datapoints,"\nCluster set: ", cluster_set)
+print("length m: ", len(m[0]))
 
 
 
 #l=[name for name in mcolors.cnames]
 #print("color map",l)
+if len(m[0])==2:
+    plot_2d(res_datapoints,m)
+
+elif len(m[0])==3:
+    print("3D")
+    plot_3d(res_datapoints,m)    
 
 
-x=[]
-y=[]
-l=[]
-for d,cl in res_datapoints:
-    x.append(d[0])
-    y.append(d[1])
-    l.append(cl+10)
-    #print(cl)
-plt.scatter(x, y, c=l)
-xm=[]
-ym=[]
-l=[]
-nm=20
-for mm in m:
-    xm.append(mm[0])
-    ym.append(mm[1])
-    l.append(nm)
-    nm +=1
 
-print(xm,ym)
-plt.scatter(xm, ym, c="red",marker="X")
-
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.show()
     
