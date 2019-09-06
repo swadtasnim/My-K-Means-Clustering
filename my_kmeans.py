@@ -38,7 +38,7 @@ def plot_3d(res_datapoints,m):
         l.append(nm)
         nm +=1
 
-    print(xm,ym,zm)
+    #print(xm,ym,zm)
     ax.scatter(xm, ym, zm, c="red",marker="X")
 
     ax.set_xlabel('X-axis')
@@ -70,7 +70,7 @@ def plot_2d(res_datapoints,m):
         l.append(nm)
         nm +=1
 
-    print(xm,ym)
+    #print(xm,ym)
     plt.scatter(xm, ym, c="red",marker="X")
 
     plt.xlabel('X')
@@ -81,7 +81,7 @@ def plot_2d(res_datapoints,m):
 
 def dist(vec1,vec2):
     
-    print("x: ",vec1,"\n m: ",vec2)
+    #print("x: ",vec1,"\n m: ",vec2)
     #d = [(a - b)**2 for a, b in zip(vec1, vec2)]
     #d = int(math.sqrt(sum(d)))+
     d = distance.euclidean(vec1,vec2)
@@ -193,11 +193,11 @@ test3_scikit = [[1, 2], [1, 4], [1, 0],[10, 2], [10, 4], [10, 0]]
 test4 = [[1,2],[3,2],[7,8],[8,4],[9,0],[40,30], [33,6],[10,39], [33,55],[40,45],[90,34]]
 
 test_random = np.random.randint(10000, size=(100, 2))
-test_random3d = np.random.randint(10000, size=(100, 3))
+test_random3d = np.random.randint(100000, size=(100, 3))
 
 
 #print(test_random)
-datapoints = {"points":test_random, "Cluster":[]}
+datapoints = {"points":test_random3d, "Cluster":[]}
 
 #print(disk_kmeans(2,datapoints))
 
