@@ -19,7 +19,7 @@ import os
 
 def plot_3d(res_datapoints,m,pdf,kk):
 
-    fig = plt.figure(kk)
+    fig = plt.figure(kk+1)
     ax = Axes3D(fig)
     x=[]
     y=[]
@@ -50,8 +50,10 @@ def plot_3d(res_datapoints,m,pdf,kk):
     ax.set_xlabel('X-axis')
     ax.set_ylabel('Y-axis')
     ax.set_zlabel('Z-axis')
+    ax.set_title("cluster number "+str(kk))
     #plt.show()
-    pdf.savefig(fig)
+    return fig
+    #pdf.savefig(fig)
 
 
 
@@ -60,7 +62,7 @@ def plot_3d(res_datapoints,m,pdf,kk):
 def plot_2d(res_datapoints,m,pdf,kk):
 
 
-    fig = plt.figure(kk)
+    fig = plt.figure(kk+1)
     x=[]
     y=[]
     l=[]
@@ -86,9 +88,11 @@ def plot_2d(res_datapoints,m,pdf,kk):
 
     plt.xlabel('X')
     plt.ylabel('Y')
+    plt.title("cluster number "+str(kk))
     
     #plt.show()
-    pdf.savefig(fig)
+    #pdf.savefig(fig)
+    return fig
 
 
 
@@ -228,7 +232,7 @@ datapoints = {"points":test_synthetic, "Cluster":[]}
 
 #print(disk_kmeans(2,datapoints))
 
-
+f_set = []
 sse_set=[]
 number_of_k= 15
 #plt.subplots(number_of_k-1,1)
@@ -246,21 +250,24 @@ for kk in range(1,number_of_k):
     #l=[name for name in mcolors.cnames]
     #print("color map",l)
     if len(m[0])==2:
-        plot_2d(res_datapoints,m,pdf,kk)
+        f_set.append(plot_2d(res_datapoints,m,pdf,kk))
 
     elif len(m[0])==3:
         print("3D")
-        plot_3d(res_datapoints,m,pdf,kk)    
+        f_set.append(plot_3d(res_datapoints,m,pdf,kk)) 
 
 print(sse_set)
 print(min(sse_set))
 print(len(sse_set))
 
-fig2 = plt.figure()
+fig2 = plt.figure(1)
 ax = plt.axes()
 
 
 ax.plot([x for x in range(1,number_of_k)], sse_set)  
 plt.show()
 pdf.savefig(fig2) 
+
+for ff in f_set:
+    pdf.savefig(ff)
 pdf.close()
