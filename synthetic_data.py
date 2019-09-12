@@ -6,10 +6,14 @@ from scipy.spatial import distance
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from collections import defaultdict
 
 
 
-def plot_3d(res_datapoints,m):
+
+
+
+def plot_3d(res_datapoints,m,pdf):
 
     fig = plt.figure()
     ax = Axes3D(fig)
@@ -43,12 +47,15 @@ def plot_3d(res_datapoints,m):
     ax.set_ylabel('Y-axis')
     ax.set_zlabel('Z-axis')
     plt.show()
+    pdf.savefig(fig)
 
 
 
 
 
-def plot_2d(res_datapoints,m):
+def plot_2d(res_datapoints,m,pdf):
+    
+    fig=plt.figure(0)
     x=[]
     y=[]
     l=[]
@@ -74,42 +81,75 @@ def plot_2d(res_datapoints,m):
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.show()
+    pdf.savefig(fig)
 
 
 
 
+def data_gen(k,dim_data,N):
+    k=k
+    dim_data = dim_data
+    N = N
+    means=np.random.randint(10000, size=(k, dim_data))
+    std = np.random.randint(1,80,size=k)
 
-k=5
-dim_data = 3
-N = 1000
-means=np.random.randint(10000, size=(k, dim_data))
-std = np.random.randint(1,80,size=k)
+    param_set = list(zip(means,std))
+    print("parameter: ",param_set)
 
-param_set = list(zip(means,std))
-print("parameter: ",param_set)
-
-m = []
-data = []
-cluster_mark = 1
-for p in param_set:
-    meu,sigma = p
-    m.append(meu)
-    x =np.random.randint(-50,50, size=(int(N/k), dim_data))
-    #np.random.randint(sigma-3,sigma+3)
+    m = []
+    data = []
+    cluster_mark = 1
+    for p in param_set:
+        meu,sigma = p
+        m.append(meu)
+        x =np.random.randint(-50,50, size=(int(N/k), dim_data))
+        #np.random.randint(sigma-3,sigma+3)
+        
+        data.extend([(np.random.randint(-sigma,sigma)*xx + meu,cluster_mark) for xx in x])
     
-    data.extend([(np.random.randint(-sigma,sigma)*xx + meu,cluster_mark) for xx in x])
-   
-    cluster_mark +=1
+        cluster_mark +=1
 
-print("datapoints: ",data)
-print("centroids: ",m)
-
-if len(m[0])==2:
-    plot_2d(data,m)
-
-elif len(m[0])==3:
-    print("3D")
-    plot_3d(data,m)  
+    print("datapoints: ",data)
+    print("centroids: ",m)
+    print("cluster mark: ", cluster_mark)
+    return m,data,cluster_mark
 
 
-#print("mue: ",means,"\nsigma: ",std)
+
+def synthesize(k,dim_data,N,pdf):
+    
+    k= k
+    dim_data = dim_data
+    N = N
+    m,data,cluster_mark = data_gen(k,dim_data,N)
+
+
+
+    if len(m[0])==2:
+        plot_2d(data,m,pdf)
+
+    elif len(m[0])==3:
+        print("3D")
+        plot_3d(data,m,pdf)  
+
+
+    #print("mue: ",means,"\nsigma: ",std)
+    d = defaultdict(list)
+    for arr, v in data:
+        d[v].append(arr)
+    print(d[1])
+
+    test_data = []
+    for key in range(1,cluster_mark):
+        test_data.extend(d[key])
+
+    print(test_data[0])
+    print(k)
+    return test_data
+
+
+
+
+
+
+

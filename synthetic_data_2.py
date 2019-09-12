@@ -81,7 +81,7 @@ prob = [.68,.28,.04,.02]
 
 
 k=8
-dim_data = 3
+dim_data = 2
 N = 100000
 means=np.random.randint(100, size=(k, dim_data))
 std = np.random.randint(1,6,size=k)

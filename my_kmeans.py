@@ -2,18 +2,24 @@ import pandas as pd
 import numpy as np
 import random,math
 from scipy.spatial import distance
-
+from math import sqrt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+from synthetic_data import synthesize
+
+from matplotlib.backends.backend_pdf import PdfPages
+
+import os
 
 
 
 
-def plot_3d(res_datapoints,m):
 
-    fig = plt.figure()
+def plot_3d(res_datapoints,m,pdf,kk):
+
+    fig = plt.figure(kk)
     ax = Axes3D(fig)
     x=[]
     y=[]
@@ -44,16 +50,21 @@ def plot_3d(res_datapoints,m):
     ax.set_xlabel('X-axis')
     ax.set_ylabel('Y-axis')
     ax.set_zlabel('Z-axis')
-    plt.show()
+    #plt.show()
+    pdf.savefig(fig)
 
 
 
 
 
-def plot_2d(res_datapoints,m):
+def plot_2d(res_datapoints,m,pdf,kk):
+
+
+    fig = plt.figure(kk)
     x=[]
     y=[]
     l=[]
+    #plt.subplot(number_of_k,2,kk)
     for d,cl in res_datapoints:
         x.append(d[0])
         y.append(d[1])
@@ -75,7 +86,9 @@ def plot_2d(res_datapoints,m):
 
     plt.xlabel('X')
     plt.ylabel('Y')
-    plt.show()
+    
+    #plt.show()
+    pdf.savefig(fig)
 
 
 
@@ -109,12 +122,14 @@ def SSE(D,m,cluster_set):
 def disk_kmeans(k,datapoints):
 
     D = datapoints["points"]
+    print(D)
     #print("datapoints: ", D)
     m=[D[i] for i in random.sample(range(len(D)),k) ]
     #print("Centroids: ",m)
 
     Cluster_set = {}
     #min_SSE = []
+
     prev_SSE = 1000000000
     relative_error = 1000000000
     #for nn in range(0,2500):
@@ -169,6 +184,8 @@ def disk_kmeans(k,datapoints):
 
         
         curr_SSE = SSE(D,m,cluster_set)
+       # sse_set.append(curr_SSE)
+        print("Current SSE: ", curr_SSE)
         relative_error = abs(prev_SSE-curr_SSE)/prev_SSE
 
         print("relative error: ",relative_error)
@@ -180,10 +197,10 @@ def disk_kmeans(k,datapoints):
 
 
 
-
+    
     #print(list(zip(datapoints["points"],datapoints["Cluster"])))
     #res_datapoints=[p,c for p,c in list(zip(points,labels))]
-    return m, list(zip(datapoints["points"],datapoints["Cluster"])),cluster_set
+    return m, list(zip(datapoints["points"],datapoints["Cluster"])),cluster_set, sqrt(prev_SSE)
 
 
 test1 = [[1],[2],[3],[7],[8],[9],[10],[11]]
@@ -196,26 +213,54 @@ test_random = np.random.randint(10000, size=(100, 2))
 test_random3d = np.random.randint(100000, size=(100, 3))
 
 
-#print(test_random)
-datapoints = {"points":test_random3d, "Cluster":[]}
+#print(test_random3d)
+
+k=5
+dim_data=3
+N=1000
+
+pdf=PdfPages("cluster.pdf")
+pdf0=PdfPages("synthetic_data.pdf")
+test_synthetic = synthesize(k,dim_data,N,pdf0)
+pdf0.close()
+#print(test_synthetic)
+datapoints = {"points":test_synthetic, "Cluster":[]}
 
 #print(disk_kmeans(2,datapoints))
 
-m,res_datapoints,cluster_set = disk_kmeans(3,datapoints)
-print("Centroids m: ",m," \nDatapoints: ",res_datapoints,"\nCluster set: ", cluster_set)
-print("length m: ", len(m[0]))
+
+sse_set=[]
+number_of_k= 15
+#plt.subplots(number_of_k-1,1)
+pdf=PdfPages("cluster.pdf")
+
+for kk in range(1,number_of_k):
+    m,res_datapoints,cluster_set,sse = disk_kmeans(kk,datapoints)
+    #print("Centroids m: ",m," \nDatapoints: ",res_datapoints,"\nCluster set: ", cluster_set)
+    #print("length m: ", len(m[0]))
+    print("SSE: ",sse)
+    sse_set.append(sse)
 
 
 
-#l=[name for name in mcolors.cnames]
-#print("color map",l)
-if len(m[0])==2:
-    plot_2d(res_datapoints,m)
+    #l=[name for name in mcolors.cnames]
+    #print("color map",l)
+    if len(m[0])==2:
+        plot_2d(res_datapoints,m,pdf,kk)
 
-elif len(m[0])==3:
-    print("3D")
-    plot_3d(res_datapoints,m)    
+    elif len(m[0])==3:
+        print("3D")
+        plot_3d(res_datapoints,m,pdf,kk)    
+
+print(sse_set)
+print(min(sse_set))
+print(len(sse_set))
+
+fig2 = plt.figure()
+ax = plt.axes()
 
 
-
-    
+ax.plot([x for x in range(1,number_of_k)], sse_set)  
+plt.show()
+pdf.savefig(fig2) 
+pdf.close()
